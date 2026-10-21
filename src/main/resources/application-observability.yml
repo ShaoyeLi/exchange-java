@@ -1,0 +1,12 @@
+spring:
+  config:
+    activate:
+      on-profile: observability
+
+logging:
+  structured:
+    format:
+      console: logstash
+    json:
+      context:
+        include: true

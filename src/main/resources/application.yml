@@ -1,0 +1,83 @@
+spring:
+  application:
+    name: exchange-java
+  datasource:
+    url: ${EXCHANGE_DB_URL:jdbc:mysql://localhost:3306/exchange_java?useSSL=false&allowPublicKeyRetrieval=true}
+    username: ${EXCHANGE_DB_USER:exchange}
+    password: ${EXCHANGE_DB_PASSWORD:exchange}
+  flyway:
+    enabled: true
+  sql:
+    init:
+      mode: never
+  kafka:
+    bootstrap-servers: ${EXCHANGE_KAFKA_BOOTSTRAP:localhost:9092}
+    producer:
+      acks: all
+      properties:
+        enable.idempotence: true
+    consumer:
+      enable-auto-commit: false
+      auto-offset-reset: earliest
+    listener:
+      ack-mode: record
+  data:
+    redis:
+      host: ${EXCHANGE_REDIS_HOST:localhost}
+      port: ${EXCHANGE_REDIS_PORT:6379}
+
+exchange:
+  messaging:
+    enabled: ${EXCHANGE_MESSAGING_ENABLED:false}
+    scheduling-enabled: ${EXCHANGE_MESSAGING_SCHEDULING_ENABLED:true}
+    topic: exchange.market.events
+    consumer-name: exchange-market-projection-v1
+    relay-name: market-events
+    batch-size: 50
+    max-attempts: 5
+    lease-duration: 10s
+    send-timeout: 5s
+    initial-backoff: 500ms
+    relay-delay: 500
+  chain:
+    enabled: ${EXCHANGE_CHAIN_ENABLED:false}
+    scheduling-enabled: ${EXCHANGE_CHAIN_SCHEDULING_ENABLED:true}
+    chain-id: ${EXCHANGE_CHAIN_ID:31337}
+    name: ${EXCHANGE_CHAIN_NAME:local-evm}
+    rpc-url: ${EXCHANGE_CHAIN_RPC_URL:http://localhost:8545}
+    start-block: ${EXCHANGE_CHAIN_START_BLOCK:0}
+    confirmation-depth: ${EXCHANGE_CHAIN_CONFIRMATIONS:12}
+    scan-batch-size: ${EXCHANGE_CHAIN_BATCH_SIZE:100}
+    reorg-lookback: ${EXCHANGE_CHAIN_REORG_LOOKBACK:100}
+    lease-duration: 20s
+    poll-delay: 2000
+  security:
+    issuer: exchange-java
+    token-ttl: 2h
+    jwt-secret: ${EXCHANGE_JWT_SECRET:local-development-secret-change-me-32-bytes}
+  demo:
+    enabled: ${EXCHANGE_DEMO_ENABLED:false}
+    trader-email: trader@example.com
+    trader-password: ${EXCHANGE_DEMO_TRADER_PASSWORD:Trader123!}
+    admin-email: admin@example.com
+    admin-password: ${EXCHANGE_DEMO_ADMIN_PASSWORD:Admin123!}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+        add-additional-paths: true
+      group:
+        readiness:
+          include: readinessState,db
+  tracing:
+    sampling:
+      probability: ${EXCHANGE_TRACE_SAMPLE_RATE:0.1}
+  metrics:
+    tags:
+      application: ${spring.application.name}

@@ -1,0 +1,12 @@
+package com.ethan.exchange.withdrawal;
+
+public enum WithdrawalErrorCode {
+    ASSET_NOT_FOUND,
+    WITHDRAWAL_NOT_FOUND,
+    WITHDRAWAL_NOT_OWNED,
+    WITHDRAWAL_NOT_CANCELABLE,
+    IDEMPOTENCY_CONFLICT,
+    INSUFFICIENT_BALANCE,
+    CONCURRENT_UPDATE,
+    NUMERIC_OVERFLOW
+}
